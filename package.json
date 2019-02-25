@@ -1,0 +1,11 @@
+{
+  "name": "trux",
+  "version": "0.0.1",
+  "description": "Transaction based state management",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Usher Klein",
+  "license": "ISC"
+}
