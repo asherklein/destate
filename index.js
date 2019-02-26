@@ -17,6 +17,6 @@ const mapToContent = pluck('content')
 
 const transReducer = (reducers) => (acc, content) => mapo((r, k) => r(acc[k], content), reducers)
 
-const getState = (myAddress, reducers) => c(reduce(transReducer(reducers), {}), mapToContent, filter(isAddressedToMe(myAddress)))(transactions)
+const receive = (myAddress, reducers) => c(reduce(transReducer(reducers), {}), mapToContent, filter(isAddressedToMe(myAddress)))(transactions)
 
-module.exports = { getState, send }
+module.exports = { send, receive }

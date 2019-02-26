@@ -2,7 +2,7 @@ const { expect } = require('chai')
 
 
 const { mergeAll } = require('ramda')
-const { getState, send } = require('../index')
+const { receive, send } = require('../index')
 
 
 const country1 = { country: 'canada' }
@@ -60,15 +60,15 @@ const locReducers = {
     story: myStoryReducer
 }
 
-const nyseState = getState(nyse, locReducers)
+const nyseState = receive(nyse, locReducers)
 const descriptReducers = locReducers
-const descriptState = getState(descript, descriptReducers)
-const descriptMtlState = getState(descriptMtl, descriptReducers)
-const descriptNyState = getState(descriptNy, descriptReducers)
+const descriptState = receive(descript, descriptReducers)
+const descriptMtlState = receive(descriptMtl, descriptReducers)
+const descriptNyState = receive(descriptNy, descriptReducers)
 
-const stanleySomewhereState = getState(stanleySomewhere, locReducers)
+const stanleySomewhereState = receive(stanleySomewhere, locReducers)
 
-const jmsbState = getState(jmsb, locReducers)
+const jmsbState = receive(jmsb, locReducers)
 
 describe('trux state derivation', () => {
     it('state for reducers exists', () => {
