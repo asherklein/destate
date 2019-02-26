@@ -2,8 +2,9 @@ const { expect } = require('chai')
 
 
 const { mergeAll } = require('ramda')
-const { receive, send } = require('../index')
+const { createLedger } = require('../index')
 
+const { send, receive} = createLedger()
 
 const country1 = { country: 'canada' }
 const city1 = { city: 'montreal' }
