@@ -1,14 +1,11 @@
 const { 
-    __, compose: c, tap,
+    __, compose: c,
     reduce, filter, all, pluck,
     mapObjIndexed: mapo, keys, eqProps  
 } = require('ramda')
 
-const log = tap((x) => console.log(x))
-
 const transactions = []
 
-// address = {prop: 1, prop2: 2}
 const send = (address, content) => transactions.push({ address: address || {}, content: content || {} })
 
 const isAddressedToMe = myAddress => trans => c(all(eqProps(__, myAddress, trans.address)), keys)(trans.address)
