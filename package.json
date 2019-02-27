@@ -1,7 +1,7 @@
 {
-  "name": "trux",
+  "name": "destate",
   "version": "0.0.1",
-  "description": "Transaction based state management",
+  "description": "Declaratrive state ",
   "main": "index.js",
   "scripts": {
     "test": "mocha"
