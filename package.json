@@ -1,9 +1,14 @@
 {
   "name": "destate",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "Declarative state",
   "main": "index.js",
-  "keywords": ["state", "declarative", "js", "react state"],
+  "keywords": [
+    "state",
+    "declarative",
+    "js",
+    "react state"
+  ],
   "scripts": {
     "test": "mocha"
   },
