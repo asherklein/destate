@@ -1,7 +1,7 @@
 {
   "name": "destate",
   "version": "0.0.1",
-  "description": "Declaratrive state ",
+  "description": "Declarative state ",
   "main": "index.js",
   "scripts": {
     "test": "mocha"
