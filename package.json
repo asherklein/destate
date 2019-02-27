@@ -1,6 +1,6 @@
 {
   "name": "destate",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "description": "Declarative state",
   "main": "index.js",
   "keywords": [
