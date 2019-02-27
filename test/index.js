@@ -4,7 +4,7 @@ const { expect } = require('chai')
 const { mergeAll } = require('ramda')
 const { createLedger } = require('../index')
 
-const { send, receive} = createLedger()
+const { send, receive, subscribe } = createLedger()
 
 const country1 = { country: 'canada' }
 const city1 = { city: 'montreal' }
@@ -19,6 +19,14 @@ const nyse = mergeAll([country2, city2, street2])
 const jmsb = mergeAll([country1, city1, { street: 'guy' }])
 const stanleySomewhere = street1
 const descript = mergeAll([country1, street1])
+
+const myStoryReducer = (state = [], { type, story }) => type == 'WHERE_I_AM' ? state.concat(story) : state
+const countVisitorsReducer = (state = 0, { type }) => type == 'VISITOR' ? state + 1 : state
+
+const locReducers = {
+    visitors: countVisitorsReducer,
+    story: myStoryReducer
+}
 
 send(descriptMtl,
     {
@@ -53,13 +61,7 @@ send({ street: 'stanley' }, { type: 'VISITOR' })
 
 
 
-const myStoryReducer = (state = [], { type, story }) => type == 'WHERE_I_AM' ? state.concat(story) : state
-const countVisitorsReducer = (state = 0, { type }) => type == 'VISITOR' ? state + 1 : state
 
-const locReducers = {
-    visitors: countVisitorsReducer,
-    story: myStoryReducer
-}
 
 const nyseState = receive(nyse, locReducers)
 const descriptReducers = locReducers
@@ -83,5 +85,29 @@ describe('trux state derivation', () => {
     })
     it('subset has less matches than superset', () => {
         expect(descriptState.visitors).to.be.above(stanleySomewhereState.visitors)
+    })
+
+})
+
+describe('subscriber receipt', () => {
+    
+    let sub;
+
+    subscribe({ street: 'random street' }, locReducers, () => console.log('sent trans to random street'))
+
+    it('subscriber notified only when addressed', (done) => {
+        const oneMoreVisitor = jmsbState.visitors + 1
+        sub = subscribe(jmsb, locReducers, ({ visitors }) => {
+            visitors == oneMoreVisitor ? done() : done(new Error('subscriber not notified'))
+        })
+
+        send({ street: 'stanley' }, { type: 'VISITOR' })
+        send({ street: 'guy' }, { type: 'VISITOR' })
+    })
+
+    it('unsubscriber not notified', (done) => {
+        sub.unSubscribe()
+        send({ street: 'guy' }, { type: 'VISITOR' })
+        done()
     })
 })
