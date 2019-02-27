@@ -20,8 +20,8 @@ const jmsb = mergeAll([country1, city1, { street: 'guy' }])
 const stanleySomewhere = street1
 const descript = mergeAll([country1, street1])
 
-const myStoryReducer = (state = [], { type, story }) => type == 'WHERE_I_AM' ? state.concat(story) : state
-const countVisitorsReducer = (state = 0, { type }) => type == 'VISITOR' ? state + 1 : state
+const myStoryReducer = (state = [], { content: { type, story } }) => type == 'WHERE_I_AM' ? state.concat(story) : state
+const countVisitorsReducer = (state = 0, { content: { type } }) => type == 'VISITOR' ? state + 1 : state
 
 const locReducers = {
     visitors: countVisitorsReducer,

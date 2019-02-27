@@ -16,9 +16,10 @@ const createLedger = () => {
 
     const mapToContent = pluck('content')
 
-    const transReducer = (reducers) => (acc, content) => mapo((r, k) => r(acc[k], content), reducers)
+    // reducers :: { name: (state, content) => state, ... }
+    const transReducer = (reducers) => (acc, trans) => mapo((r, k) => r(acc[k], trans), reducers)
 
-    const receive = (myAddress, reducers) => c(reduce(transReducer(reducers), {}), mapToContent, filter(c(isAddressedToMe(myAddress), prop('address'))))(transactions)
+    const receive = (myAddress, reducers) => c(reduce(transReducer(reducers), {}), filter(c(isAddressedToMe(myAddress), prop('address'))))(transactions)
 
     // uponReceipt :: subscriber -> ()
     const subscriberReceives = ({ address, reducers, onReceipt }) => onReceipt(receive(address, reducers)) 
