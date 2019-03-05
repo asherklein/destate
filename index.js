@@ -5,9 +5,12 @@ const {
     mapObjIndexed: mapo, keys, eqProps, prop
 } = require('ramda')
 
+
+const initialTrans = { address: {}, content: { type: '@@__INIT__@@' } }
+
 const createLedger = () => {
     
-    const transactions = []
+    const transactions = [initialTrans]
 
     const subscribers = []
 
