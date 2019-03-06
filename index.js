@@ -1,6 +1,5 @@
 const {
     __, compose: c, curry,
-    allPass,
     reduce, filter, forEach, all, pluck,
     mapObjIndexed: mapo, keys, eqProps, prop, toString
 } = require('ramda')
@@ -14,16 +13,11 @@ const createLedger = () => {
 
     const subscribers = []
 
-    const latestState = {}
-
-
 
 
     const isAddressedToMe = curry((myAddress, address) => c(all(eqProps(__, myAddress, address)), keys)(address))
 
-    const mapToContent = pluck('content')
-
-    // reducers :: { name: (state, content) => state, ... }
+    // reducers :: { name: state -> content -> state, ... }
     // transReducer :: reducers -> (state -> trans -> state) 
     const transReducer = (reducers) => (acc, trans) => mapo((r, k) => r(acc[k], trans), reducers)
 
