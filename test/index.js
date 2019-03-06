@@ -97,7 +97,12 @@ describe('subscriber receipt', () => {
 
     it('subscriber notified only when addressed', (done) => {
         const oneMoreVisitor = jmsbState.visitors + 1
+        let ignoreFirst = true
         sub = subscribe(jmsb, locReducers, ({ visitors }) => {
+            if(ignoreFirst) {
+                ignoreFirst = false
+                return
+            }
             visitors == oneMoreVisitor ? done() : done(new Error('subscriber not notified'))
         })
 
@@ -105,9 +110,18 @@ describe('subscriber receipt', () => {
         send({ street: 'guy' }, { type: 'VISITOR' })
     })
 
+
     it('unsubscriber not notified', (done) => {
         sub.unSubscribe()
         send({ street: 'guy' }, { type: 'VISITOR' })
         done()
+    })
+
+    it('subscriber can receive', () => {
+        const sub2 = subscribe(jmsb, locReducers, (state) => console.log('received from sub2', state))
+        expect(sub2.receive().visitors).to.be.equal(jmsbState.visitors + 2)
+        send({ street: 'guy' }, { type: 'VISITOR' })
+        expect(sub2.receive().visitors).to.be.equal(jmsbState.visitors + 3)
+          
     })
 })
