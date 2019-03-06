@@ -27,7 +27,7 @@ const createLedger = () => {
     // transReducer :: reducers -> (state -> trans -> state) 
     const transReducer = (reducers) => (acc, trans) => mapo((r, k) => r(acc[k], trans), reducers)
 
-    const receive = (myAddress, reducers) => c(reduce(transReducer(reducers), {}), filter(c(isAddressedToMe(myAddress), prop('address'))))(transactions)
+    const receive = (myAddress = {}, reducers = {}) => c(reduce(transReducer(reducers), {}), filter(c(isAddressedToMe(myAddress), prop('address'))))(transactions)
 
     // // uponReceipt :: subscriber -> ()
     // const subscriberReceives = ({ address, reducers, onReceipt }) => onReceipt(receive(address, reducers)) 
@@ -53,7 +53,7 @@ const createLedger = () => {
     }
 
     // onReceipt :: (mystate) -> ()
-    const subscribe = (myAddress, reducers, onReceipt) => {
+    const subscribe = (myAddress = {}, reducers = {}, onReceipt) => {
         const latest = receive(myAddress, reducers)
         const sub = { address: myAddress, reducers, onReceipt, latest }
         sub.update = (latest) => sub.latest = latest
