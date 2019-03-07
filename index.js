@@ -1,7 +1,7 @@
 const {
     __, compose: c, curry,
-    reduce, filter, forEach, all, pluck,
-    mapObjIndexed: mapo, keys, eqProps, prop, toString
+    reduce, filter, forEach, all, 
+    mapObjIndexed: mapo, keys, eqProps, prop
 } = require('ramda')
 
 
@@ -16,13 +16,13 @@ const createRulebook = () => {
 
 
 
-    const ruleApplies = curry((goal, head) => c(all(eqProps(__, goal, head)), keys)(head))
+    const unifies = curry((goal, head) => c(all(eqProps(__, goal, head)), keys)(head))
 
     // reducers :: { name: state -> body -> state, ... }
     // ruleReducer :: reducers -> (state -> rule -> state) 
     const ruleReducer = (reducers) => (acc, rule) => mapo((r, k) => r(acc[k], rule), reducers)
 
-    const query = (goal = {}, reducers = {}) => c(reduce(ruleReducer(reducers), {}), filter(c(ruleApplies(goal), prop('head'))))(rulebook)
+    const query = (goal = {}, reducers = {}) => c(reduce(ruleReducer(reducers), {}), filter(c(unifies(goal), prop('head'))))(rulebook)
 
     // uponStateChange :: subscriber -> ()
     const queryAndUpdateSub = (rule) =>
@@ -32,12 +32,15 @@ const createRulebook = () => {
             onStateChange(updated)
         }
 
-    const defineRule = (head = {}, body = {}) => {
+    const addRule = (head = {}, body = {}) => {
         const rule = { head, body }
         rulebook.push(rule)
-        c(forEach(queryAndUpdateSub(rule)), filter(c(ruleApplies(__, head), prop('goal'))))(subscribers)
         return rule
     }
+    
+    const notifySubscribers = (rule) => c(forEach(queryAndUpdateSub(rule)), filter(c(unifies(__, rule.head), prop('goal'))))(subscribers)
+    
+    const defineRule = c(notifySubscribers, addRule)
 
     const dirtyUnSubscribe = (sub) => {
         const found = subscribers.indexOf(sub)
