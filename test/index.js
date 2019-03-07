@@ -2,9 +2,9 @@ const { expect } = require('chai')
 
 
 const { mergeAll } = require('ramda')
-const { createLedger } = require('../index')
+const { createRulebook } = require('../index')
 
-const { send, receive, subscribe } = createLedger()
+const { defineRule, query, subscribe } = createRulebook()
 
 const country1 = { country: 'canada' }
 const city1 = { city: 'montreal' }
@@ -20,60 +20,60 @@ const jmsb = mergeAll([country1, city1, { street: 'guy' }])
 const stanleySomewhere = street1
 const descript = mergeAll([country1, street1])
 
-const myStoryReducer = (state = [], { content: { type, story } }) => type == 'WHERE_I_AM' ? state.concat(story) : state
-const countVisitorsReducer = (state = 0, { content: { type } }) => type == 'VISITOR' ? state + 1 : state
+const myStoryReducer = (state = [], { body: { type, story } }) => type == 'WHERE_I_AM' ? state.concat(story) : state
+const countVisitorsReducer = (state = 0, { body: { type } }) => type == 'VISITOR' ? state + 1 : state
 
 const locReducers = {
     visitors: countVisitorsReducer,
     story: myStoryReducer
 }
 
-send(descriptMtl,
+defineRule(descriptMtl,
     {
         type: 'WHERE_I_AM',
         story: 'I live on Stanley St, Montreal, Canada'
     }
 )
-send(nyse,
+defineRule(nyse,
     {
         type: 'WHERE_I_AM',
         story: 'I\'m on on Wall St, NY, USA'
     }
 )
-send(stanleySomewhere,
+defineRule(stanleySomewhere,
     {
         type: 'WHERE_I_AM',
         story: 'I\'m on a street named Stanley'
     }
 )
 
-send({ city: 'montreal' },
+defineRule({ city: 'montreal' },
     {
         type: 'WHERE_I_AM',
         story: 'I\'m in montreal'
     })
 
 
-send(descript, { type: 'VISITOR' })
-send(descriptMtl, { type: 'VISITOR' })
-send({ city: 'montreal' }, { type: 'VISITOR' })
-send({ street: 'stanley' }, { type: 'VISITOR' })
+defineRule(descript, { type: 'VISITOR' })
+defineRule(descriptMtl, { type: 'VISITOR' })
+defineRule({ city: 'montreal' }, { type: 'VISITOR' })
+defineRule({ street: 'stanley' }, { type: 'VISITOR' })
 
 
 
 
 
-const nyseState = receive(nyse, locReducers)
+const nyseState = query(nyse, locReducers)
 const descriptReducers = locReducers
-const descriptState = receive(descript, descriptReducers)
-const descriptMtlState = receive(descriptMtl, descriptReducers)
-const descriptNyState = receive(descriptNy, descriptReducers)
+const descriptState = query(descript, descriptReducers)
+const descriptMtlState = query(descriptMtl, descriptReducers)
+const descriptNyState = query(descriptNy, descriptReducers)
 
-const stanleySomewhereState = receive(stanleySomewhere, locReducers)
+const stanleySomewhereState = query(stanleySomewhere, locReducers)
 
-const jmsbState = receive(jmsb, locReducers)
+const jmsbState = query(jmsb, locReducers)
 
-describe('trux state derivation', () => {
+describe('destate state derivation', () => {
     it('state for reducers exists', () => {
         expect(Object.keys(descriptState)).to.have.members(Object.keys(descriptReducers))
     })
@@ -106,22 +106,22 @@ describe('subscriber receipt', () => {
             visitors == oneMoreVisitor ? done() : done(new Error('subscriber not notified'))
         })
 
-        send({ street: 'stanley' }, { type: 'VISITOR' })
-        send({ street: 'guy' }, { type: 'VISITOR' })
+        defineRule({ street: 'stanley' }, { type: 'VISITOR' })
+        defineRule({ street: 'guy' }, { type: 'VISITOR' })
     })
 
 
     it('unsubscriber not notified', (done) => {
         sub.unSubscribe()
-        send({ street: 'guy' }, { type: 'VISITOR' })
+        defineRule({ street: 'guy' }, { type: 'VISITOR' })
         done()
     })
 
-    it('subscriber can receive', () => {
-        const sub2 = subscribe(jmsb, locReducers, (state) => console.log('received from sub2', state))
-        expect(sub2.receive().visitors).to.be.equal(jmsbState.visitors + 2)
-        send({ street: 'guy' }, { type: 'VISITOR' })
-        expect(sub2.receive().visitors).to.be.equal(jmsbState.visitors + 3)
+    it('subscriber can query', () => {
+        const sub2 = subscribe(jmsb, locReducers, (state) => console.log('queryd from sub2', state))
+        expect(sub2.query().visitors).to.be.equal(jmsbState.visitors + 2)
+        defineRule({ street: 'guy' }, { type: 'VISITOR' })
+        expect(sub2.query().visitors).to.be.equal(jmsbState.visitors + 3)
           
     })
 })
