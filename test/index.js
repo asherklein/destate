@@ -4,7 +4,7 @@ const { expect } = require('chai')
 const { mergeAll } = require('ramda')
 const { createRulebook } = require('../index')
 
-const { defineRule, query, subscribe } = createRulebook()
+const { defineRule, query, subscribe, rulebook } = createRulebook()
 
 const country1 = { country: 'canada' }
 const city1 = { city: 'montreal' }
@@ -90,7 +90,7 @@ describe('destate state derivation', () => {
 })
 
 describe('subscriber receipt', () => {
-    
+
     let sub;
 
     subscribe({ street: 'random street' }, locReducers, () => console.log('sent trans to random street'))
@@ -99,7 +99,7 @@ describe('subscriber receipt', () => {
         const oneMoreVisitor = jmsbState.visitors + 1
         let ignoreFirst = true
         sub = subscribe(jmsb, locReducers, ({ visitors }) => {
-            if(ignoreFirst) {
+            if (ignoreFirst) {
                 ignoreFirst = false
                 return
             }
@@ -122,6 +122,23 @@ describe('subscriber receipt', () => {
         expect(sub2.query().visitors).to.be.equal(jmsbState.visitors + 2)
         defineRule({ street: 'guy' }, { type: 'VISITOR' })
         expect(sub2.query().visitors).to.be.equal(jmsbState.visitors + 3)
-          
+
     })
+
+
 })
+
+
+const jmsbStateAgain = query(jmsb, locReducers)
+const { query: queryloaded } = createRulebook(rulebook)
+const reloadedJmsbState  = queryloaded(jmsb, locReducers)
+
+describe('serializability', () => {
+
+    it('state persists', () => {
+        expect(jmsbStateAgain.visitors).to.be.equal(reloadedJmsbState.visitors)
+    })
+
+})
+
+
